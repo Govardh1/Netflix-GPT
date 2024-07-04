@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import Header from "./Header";
 import { checkValidData } from "../utils/validate";
+import {signInWithEmailAndPassword , createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../utils/fireBase.jsx";
 const Login=()=>{
     const [isSignInForm,setisSignInForm]=useState(true)
     const[errorMessage,setErrorMessage]=useState();
@@ -11,12 +13,39 @@ const Login=()=>{
     const password=useRef(null);
     const Name=useRef(null)
     const handelButtonclic=()=>{
-        
-       
-        // const msg=checkValidData(email.current.value,password.current.value,Name.current.value);
-        const message=checkValidData(email.current.value,password.current.value,Name.current.value);
-        setErrorMessage(message)
-        // setErrorMessage(msg)
+
+        const message=checkValidData(email.current.value,password.current.value);
+        setErrorMessage(message)  
+        if(message) return;
+        if(!isSignInForm){
+            // const auth = getAuth();
+            createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+        .then((userCredential) => {
+            // Signed up 
+            const user = userCredential.user;
+            console.log(user);
+            // ...
+        })
+        .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setErrorMessage(errorCode +"-"+errorMessage)
+            // ..
+  });
+        }else{
+            signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    setErrorMessage(errorCode+"-"+errorMessage)
+  });
+
+        }
     }
 return (
     <div className="">
