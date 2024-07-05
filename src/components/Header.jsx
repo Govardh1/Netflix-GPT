@@ -1,10 +1,30 @@
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { addUser, removeUser } from '../utils/userSlice' 
+import { auth } from '../utils/fireBase'
 
 export const Header = () => {
+  const dispatch =useDispatch()
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    
+    
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        dispatch (addUser(uid))
+        navigate("/browse")
+      } else {
+        dispatch (removeUser())
+        navigate("/")
+      }
+    });
+   },[dispatch])
+
 
   useEffect(() => {
     const auth = getAuth();
